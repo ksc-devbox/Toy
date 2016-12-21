@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <style>
+   body {
+    margin: 0px;
+    overflow: hidden;
+   }
+   canvas {
+        border: 1px solid #9C9898;
+      }
+  </style>
+  <!--Use:for adding canvas to ie     download excanvas from: http://code.google.com/p/explorercanvas/ -->
+  <!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+</head>
+<body>
+<canvas id="myCanvas" width="300" height="350">
+your browser does not support the canvas tag </canvas>
+<div id="result"></div>
+<script type="text/javascript">
+// use requestAnimFrame for better and smooth animation
+window.requestAnimFrame = (function(callback){
+    return window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function(callback){
+        window.setTimeout(callback, 1000 / 60);
+    };
+})();
+function animate(lastTime){
+  
+        var canvas = document.getElementById("myCanvas");
+        var context = canvas.getContext("2d");
+
+        // update
+        var date = new Date();
+        var time = date.getTime();
+        var timeDiff = time - lastTime;
+        var linearSpeed = 100;
+        // pixels / second
+        var linearDistEachFrame = linearSpeed * timeDiff / 1000;
+        
+        lastTime = time;
+
+        // clear
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        // draw
+    draw(context);
+
+        // request new frame
+        requestAnimFrame(function(){
+            animate(lastTime);
+        });
+  
+}
+var radius=100;
+var x=150;
+var y=150;
+var color="#ff0000";
+window.onload = function() {
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var date = new Date();
+    var time = date.getTime();
+    animate(time);
+};
+function draw(ctx)
+{
+  ctx.fillStyle=color;
+  ctx.strokeStyle=color;
+  ctx.beginPath();
+  ctx.arc(x,y,radius,0,2*Math.PI);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+}
+(function($) {
+var myctx = $("#myCanvas");
+  
+    myctx.mousemove(function(e) {
+ //get current mouse pos
+ var mouseX=e.pageX - this.offsetLeft;
+ var mouseY=e.pageY - this.offsetTop;
+ /*logic: if the distance of current mouse position from centre of the circle is lessthan its radius then mouse pointer is in the circle */
+ var distance=Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));//distance formula sqrt((x1-x2)^2+(y1-y2)^2)
+ if (distance <= radius) {
+  $("#result").text("IN");
+ }
+ else
+ {
+  $("#result").text("OUT");
+ }
+ });
+})(jQuery);
+</script>
+</body>
+</html>

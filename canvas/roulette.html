@@ -1,0 +1,469 @@
+<head>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <title>ksc 룰렛</title>
+</head>
+<style type="text/css">
+    body{
+        margin:0px;
+    }
+    #can
+    {
+        border:1px solid #bdbdbd;
+        display: none
+    }
+    #sliceCnt{
+        width: 40px;
+    }
+    #spinBtn{
+        display: none;
+    }
+    #changeName{
+        display: none;
+        width:100%;
+        height: 100%;
+        background:  rgba(0,0,0,0.5);
+        position: fixed;
+    }
+
+    #inputBox{
+        top: 120px;
+        left: 100px;
+        position: relative;
+    }
+
+    #inputBox label{
+        color:#fff;
+    }
+</style>
+<div id ="changeName">
+    <div id="inputBox">
+        <label>Change Name</label>
+        <input type="hidden"  id="cIdx" value="">
+        <input type="text"  id="cValue" value="">
+        <input type="button" id="btnChangeName" value="확인">
+        <input type="button" id="btnCancel" value="취소">
+    </div>
+</div>
+<div>
+   <lable>인원</lable><input  type="text" id="sliceCnt"  value="3">
+    <select  id="sliceSizeOpt">
+        <option value="true">균등분배</option>
+        <option value="false">임의분배</option>
+    </select>
+    <input type="button" id="setBtn"  value="그리기">
+    <input type="button" id="spinBtn"  value="추첨">
+</div>
+<div>
+    <canvas id="can" width="600" height="500" ></canvas>
+</div>
+<script type="text/javascript">
+    //로테이션 구분
+    var _rotateList = [];
+    // 최대 조각 개수
+    var _maxSize = 20;
+    // 최소 각도
+    var _minRadian = 10;
+    // 회전 각도
+    var _rotate = 180;
+    // 회전 속도
+    var _speed = 360;
+    // 룰렛 상태
+    var _state = 'stop';
+    // 캔버스 객체를 찾음
+    var canvas = document.getElementById('can');
+    // 캔버스에서 Context 함수로 2d 객체를 가져옴
+    var ctx = canvas.getContext('2d');
+    // 애니메이션 효과를 위한 AnimationFrame 객체 설정
+    window.requestAnimFrame = (function(callback) {
+      return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+      function(callback) {
+        window.setTimeout(callback, 1000 / 60);
+      };
+    })();
+
+    canvas.onmousedown = changeName;
+    canvas.onmousemove = hoverCursor;
+
+    if(ctx){
+        $('#setBtn').on('click',function  () {
+            _state = 'stop';
+            //회전수 및 각도 재설정
+            setRandomSprin();
+            // _speed = 360;
+            // _rotate = 180;
+            var sliceOption = $('#sliceSizeOpt option:selected') .val();
+            var sliceCnt = $('#sliceCnt').val();
+
+            // 사이즈가 지정되지 않으면 기본 5
+            if(sliceCnt == '' || sliceCnt == undefined){
+                sliceCnt = 5; 
+                $('#sliceCnt').val('5');
+            }
+
+            if (sliceCnt  > 20){
+                return alert('최대 20개 를 넘을 수 없습니다.');
+            }
+
+            // 원 나누기
+            if (sliceOption == 'true') {
+                setSliceCircle(sliceCnt, true);
+            }else{
+                setSliceCircle(sliceCnt, false);
+            }
+
+            //resetCanvas(canvas,ctx);
+            //ctx.resetTransform();
+            /// 캔버스 클리어
+            ctx.setTransform(1,0,0,1,0,0);
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+
+            drawLabel(ctx);
+            drawSliceCircle(canvas,ctx);
+            drawArrow(canvas, ctx);
+
+            $('#spinBtn').show();
+            $('#can').fadeIn();
+        })
+
+        $('#spinBtn').on('click', function  () {
+                if(_state =='spin'){
+                    return alert('이미 추첨중입니다.');
+                }
+                else{
+                    _state = 'spin';
+                    spinCircle(canvas,ctx);
+                }
+        });
+    }
+    else{
+        alert('지원하지 않는 브라우저 입니다.');
+    }
+
+    // 룰렛 회전
+    function spinCircle  (canvas, context) {
+        var  centerX = Math.floor(canvas.width/2); //캔버스 중심점 구하기
+        var  centerY = Math.floor(canvas.height /2); //캔버스 중심점 구하기
+        var rotateAngle = getRadian(_rotate);
+
+        if (_state =='spin'){
+            context.save();
+            context.translate(centerX, centerY);  // 이미지를 회전할 좌표를 설정합니다.
+            context.rotate(rotateAngle); 
+            context.translate(-centerX, -centerY);
+            // 좌표를 회전한  상태로 원을 그립니다.
+            drawSliceCircle(canvas, context) ; 
+
+            drawArrow(canvas, ctx);
+
+           _speed =_speed - 1;
+           // console.log(_rotate);
+            if (_speed >= 0){
+                _rotate = _rotate -0.5;
+                window.requestAnimFrame(function  () {
+                    setTimeout(function(){
+                        spinCircle(canvas,ctx) ;    
+                    }, 1200/_speed);
+                    
+                });
+            }
+            else if (_speed <= 0) {
+                _state = 'stop';
+                setRandomSprin()
+                // _speed = 360;
+                // _rotate = 180;
+            }
+        }
+    };
+
+    //화살표 그리기
+    function drawArrow (canvas, context) {
+            var  centerX = Math.floor(canvas.width/2); //캔버스 중심점 구하기
+            var  centerY = Math.floor(canvas.height /2); //캔버스 중심점 구하기
+            context.save();
+            ctx.setTransform(1,0,0,1,0,0);
+
+            context.beginPath();
+            // 그릴 좌표 기준점
+            context.moveTo(centerX, 60);
+            context.lineTo(centerX -10, 40);
+            context.lineTo(centerX + 10, 40);
+            context.closePath();
+
+            context.strokeStyle= '#fff';
+            context.lineWidth =3;
+            context.stroke();
+
+            context.fillStyle ='#5B91EA';
+            context.fill();
+            context.restore();
+    }
+    
+    //룰렛 원 그리기
+    function drawSliceCircle (canvas, context) {
+        var  centerX = Math.floor(canvas.width/2); //캔버스 중심점 구하기
+        var  centerY = Math.floor(canvas.height /2); //캔버스 중심점 구하기
+        var dx = Math.floor(canvas.width * 0.28) ; // label 위치 x 값
+        var dy = Math.floor(canvas.height * 0.035); // label 위치 y값
+
+        for (var i = 0; i < _rotateList.length; i++) {
+            context.save();
+            var startAngle = getRadian(getRotate(i));
+            var endAngle = getRadian(_rotateList[i]['rotate']) + startAngle; //종료 각도 구하기
+
+            context.beginPath();
+            //console.log('angle x, y => ' + startAngle + ',' + endAngle);
+            context.moveTo(centerX,centerY); //중심점 x  y 만큼 이동
+            context.arc(centerX,centerY, 200, startAngle,endAngle); // 시작 좌표, 끝 좌표 ,  원의 크기, 시작 각도, 끝 각도
+            context.closePath();
+
+            //색 지정 & 채우기
+            context.fillStyle = _rotateList[i]['color'];
+            context.fill();
+
+            //테두리  지정
+            context.strokeStyle= '#fff';
+            context.lineWidth =0.7;
+            context.stroke();
+
+            //label
+            context.save();
+            context.translate(centerX,centerY);
+            context.rotate(startAngle);
+            context.textAlign = 'right';
+            context.font  = '12pt Arial';
+            context.fillStyle = '#fff';
+            //context.fillText(_rotateList[i]['rotate'] , dx, dy);
+            context.fillText( _rotateList[i]['name']  , dx, dy);
+            context.restore();
+        }
+    }
+    
+    // 레이블 그리기
+    function drawLabel (context) {
+        context.save();
+        context.font  = '11pt Arial';
+        var rectWidth = 14;
+        var rectHeight = 12;
+        var x = 8;
+        
+        context.fillStyle = '#000';
+        context.fillText('To change the label name, click a color.', 6 , 15);
+
+        for (var i = 0; i < _rotateList.length; i++) {
+            var  y  = 20 * (i+1);
+            
+            // 칼라 사각형 그리기
+            context.fillStyle = _rotateList[i]['color'];
+            context.fillRect(x, y ,rectWidth , rectHeight);
+
+            // 칼라 이름 
+            // 좌표 = x  + 사각형길이 +1 이 시작점
+            context.fillStyle = '#000';
+            context.fillText(_rotateList[i]['name'] , x + rectWidth +1, y + rectHeight -1);
+
+            // 좌표 저장
+            _rotateList[i]['position'] = { startX:x , startY: y,  endX : x+rectWidth, endY: y+rectHeight};
+        }
+        context.restore();
+    }
+
+    //그릴 앵글의 각도 구하기
+    // http://www.w3schools.com/tags/canvas_arc.asp   angle 참조.
+    // 각도는 단위는 '도(dgree)'가 아니라  '라디안(radian)'을 사용한다.
+    // 도를 라디안으로 바꾸는 식   ex) 라디안 = 도 * Math.PI/180;
+    function getRadian (rotate) {
+        return (rotate * Math.PI) /180;
+    }
+
+    // 현재 앵글 시작점을 구한다.
+    function getRotate (i) {
+        var sum = 0;
+
+        for(var n= 0; n < i ; n++){
+            sum += _rotateList[n]['rotate'];
+        }
+
+        return sum;
+    }
+
+    // 클릭 이벤트 
+    function changeName (e){
+        if(_state != 'spin'){
+            var  canvasX = e.pageX - this.offsetLeft;
+            var  canvasY = e.pageY - this.offsetTop;
+
+            // console.log(canvasX + '/'+canvasY);
+            for (var i = 0; i < _rotateList.length; i++) {
+                 var startX  = _rotateList[i]['position']['startX'];
+                 var startY  = _rotateList[i]['position']['startY'];
+                 var endX  = _rotateList[i]['position']['endX'];
+                 var endY  = _rotateList[i]['position']['endY'];
+
+                 if (startX <= canvasX && endX >= canvasX  && startY <= canvasY && endY >= canvasY){
+                        $('#cIdx').val(i);
+                        $('#changeName').fadeIn();
+                        break;
+                 }
+            };
+        }
+        else{
+            alert('추첨중에 이름을 바꿀 수 없습니다.');
+        }
+    }
+
+    function hoverCursor (e) {
+            var  canvasX = e.pageX - this.offsetLeft;
+            var  canvasY = e.pageY - this.offsetTop;
+            var can = document.getElementById('can');
+
+            for (var i = 0; i < _rotateList.length; i++) {
+                 var startX  = _rotateList[i]['position']['startX'];
+                 var startY  = _rotateList[i]['position']['startY'];
+                 var endX  = _rotateList[i]['position']['endX'];
+                 var endY  = _rotateList[i]['position']['endY'];
+
+                 if (startX <= canvasX && endX >= canvasX  && startY <= canvasY && endY >= canvasY){
+                        can.style.cursor = 'pointer';
+                        break;
+                 }
+                else{
+                        can.style.cursor = 'default';
+                }
+                 
+            };
+    }
+
+    //RGB 값 리턴 
+    //#FF2B23
+    function getRGB () {
+        var rgb = '#';
+
+        for (var a = 0; a < 3; a++) {
+            var temp = Math.floor(Math.random()*256).toString(16);
+            if (temp.length < 2){
+                 temp = '0'+temp;
+            }
+            rgb += temp;
+        }
+
+        return rgb;
+    }
+    //  기본 원 값 셋팅
+    function setSliceCircle (sliceCnt, sliceOption) {
+        // 초기화
+        _rotateList = [];
+        // 기본값일 경우 균등 분배
+        if (sliceOption) {
+            var defaultSize =  Math.floor(360/sliceCnt);
+
+            for (var s = 0; s < sliceCnt; s++) {
+                _rotateList.push({rotate:defaultSize, color: getRGB(), name : s+1});
+            }
+        }
+        else{
+            var maxRandomNum = 360;
+            var minRadian = 0;
+            var tmpRandomNum = 0;
+            for (var i = 1; i <= sliceCnt; i++) {
+                // 최대 360 도 나오는걸 막기 위한 값
+                var tmpCnt = sliceCnt -i;
+                var randomSize = 0;
+
+                minRadian = _minRadian * (tmpCnt);
+                maxRandomNum  = 360 - (minRadian+tmpRandomNum);
+                
+                // 마지막엔 모자란 수만큼 채워준다
+                if ( i == sliceCnt) {
+                    randomSize = maxRandomNum
+                }
+                else{
+                   randomSize = Math.floor(Math.random() * maxRandomNum);
+                }
+
+                if(randomSize < _minRadian){
+                    randomSize = _minRadian;
+                }
+
+                // console.log(maxRandomNum + ' /  randomSize' + randomSize);
+                _rotateList.push({rotate:randomSize, color: getRGB(), name : i});
+
+                tmpRandomNum += randomSize;
+            }
+        }
+    }
+
+    // 회전 각도 및 스피드 재설정
+    function setRandomSprin() {
+         var randomSpeed =  0;
+
+         while(randomSpeed < 90){
+               randomSpeed =  Math.floor(Math.random()*360);
+         }
+
+         _speed = randomSpeed;
+         _rotate = Math.round(_speed/2);
+
+         console.log(_speed);
+         console.log(_rotate);
+    }
+
+$('#cValue').on('keypress',  function  (e) {
+    if(e.keyCode == '13'){
+        var cIdx = $('#cIdx').val();
+
+        if (cIdx != '' && cIdx != undefined){
+            var thisValue = $(this).val();
+
+            if (thisValue != '' && thisValue != undefined){
+                _rotateList[cIdx]['name'] = thisValue;
+                var can = document.getElementById('can');
+                // 캔버스에서 Context 함수로 2d 객체를 가져옴
+                var contx = canvas.getContext('2d');
+
+                contx.setTransform(1,0,0,1,0,0);
+                contx.clearRect(0,0, can.width, can.height);
+
+                drawLabel(contx);
+                drawSliceCircle(can,contx);
+                drawArrow(can, contx);
+                 $('#changeName').fadeOut();
+                 $(this).val('');
+            }
+        }
+        else {
+            alert('값이 잘 못 되었습니다. 취소 하신 후 다시 선택해 주세요.');
+        }
+    }
+})
+
+$('#btnChangeName').on('click',  function  (e) {
+        var cIdx = $('#cIdx').val();
+
+        if (cIdx != '' && cIdx != undefined){
+            var cValue = $('#cValue').val();
+
+            if (cValue != '' && cValue != undefined){
+                _rotateList[cIdx]['name'] = cValue;
+                var can = document.getElementById('can');
+                // 캔버스에서 Context 함수로 2d 객체를 가져옴
+                var contx = canvas.getContext('2d');
+
+                contx.setTransform(1,0,0,1,0,0);
+                contx.clearRect(0,0, can.width, can.height);
+
+                drawLabel(contx);
+                drawSliceCircle(can,contx);
+                drawArrow(can, contx);
+                 $('#changeName').fadeOut();
+                 $('#cValue').val('');
+            }
+        }
+        else {
+            alert('값이 잘 못 되었습니다. 취소 하신 후 다시 선택해 주세요.');
+        }
+})
+
+$('#btnCancel').on('click', function  () {
+    $('#changeName').fadeOut();
+})
+</script>
