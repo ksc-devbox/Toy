@@ -1,8 +1,8 @@
+<html>
 <head>
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-    <title>ksc ·ê·¿</title>
-</head>
-<style type="text/css">
+    <title>ksc ë£°ë ›</title>
+    <style type="text/css">
     body{
         margin:0px;
     }
@@ -35,45 +35,47 @@
         color:#fff;
     }
 </style>
+</head>
+<body>
 <div id ="changeName">
     <div id="inputBox">
         <label>Change Name</label>
         <input type="hidden"  id="cIdx" value="">
         <input type="text"  id="cValue" value="">
-        <input type="button" id="btnChangeName" value="È®ÀÎ">
-        <input type="button" id="btnCancel" value="Ãë¼Ò">
+        <input type="button" id="btnChangeName" value="í™•ì¸">
+        <input type="button" id="btnCancel" value="ì·¨ì†Œ">
     </div>
 </div>
 <div>
-   <lable>ÀÎ¿ø</lable><input  type="text" id="sliceCnt"  value="3">
+   <lable>ì¸ì›</lable><input  type="text" id="sliceCnt"  value="3">
     <select  id="sliceSizeOpt">
-        <option value="true">±ÕµîºĞ¹è</option>
-        <option value="false">ÀÓÀÇºĞ¹è</option>
+        <option value="true">ê· ë“±ë¶„ë°°</option>
+        <option value="false">ì„ì˜ë¶„ë°°</option>
     </select>
-    <input type="button" id="setBtn"  value="±×¸®±â">
-    <input type="button" id="spinBtn"  value="ÃßÃ·">
+    <input type="button" id="setBtn"  value="ê·¸ë¦¬ê¸°">
+    <input type="button" id="spinBtn"  value="ì¶”ì²¨">
 </div>
 <div>
     <canvas id="can" width="600" height="500" ></canvas>
 </div>
 <script type="text/javascript">
-    //·ÎÅ×ÀÌ¼Ç ±¸ºĞ
+    //ë¡œí…Œì´ì…˜ êµ¬ë¶„
     var _rotateList = [];
-    // ÃÖ´ë Á¶°¢ °³¼ö
+    // ìµœëŒ€ ì¡°ê° ê°œìˆ˜
     var _maxSize = 20;
-    // ÃÖ¼Ò °¢µµ
+    // ìµœì†Œ ê°ë„
     var _minRadian = 10;
-    // È¸Àü °¢µµ
+    // íšŒì „ ê°ë„
     var _rotate = 180;
-    // È¸Àü ¼Óµµ
+    // íšŒì „ ì†ë„
     var _speed = 360;
-    // ·ê·¿ »óÅÂ
+    // ë£°ë › ìƒíƒœ
     var _state = 'stop';
-    // Äµ¹ö½º °´Ã¼¸¦ Ã£À½
+    // ìº”ë²„ìŠ¤ ê°ì²´ë¥¼ ì°¾ìŒ
     var canvas = document.getElementById('can');
-    // Äµ¹ö½º¿¡¼­ Context ÇÔ¼ö·Î 2d °´Ã¼¸¦ °¡Á®¿È
+    // ìº”ë²„ìŠ¤ì—ì„œ Context í•¨ìˆ˜ë¡œ 2d ê°ì²´ë¥¼ ê°€ì ¸ì˜´
     var ctx = canvas.getContext('2d');
-    // ¾Ö´Ï¸ŞÀÌ¼Ç È¿°ú¸¦ À§ÇÑ AnimationFrame °´Ã¼ ¼³Á¤
+    // ì• ë‹ˆë©”ì´ì…˜ íš¨ê³¼ë¥¼ ìœ„í•œ AnimationFrame ê°ì²´ ì„¤ì •
     window.requestAnimFrame = (function(callback) {
       return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
       function(callback) {
@@ -87,24 +89,24 @@
     if(ctx){
         $('#setBtn').on('click',function  () {
             _state = 'stop';
-            //È¸Àü¼ö ¹× °¢µµ Àç¼³Á¤
+            //íšŒì „ìˆ˜ ë° ê°ë„ ì¬ì„¤ì •
             setRandomSprin();
             // _speed = 360;
             // _rotate = 180;
             var sliceOption = $('#sliceSizeOpt option:selected') .val();
             var sliceCnt = $('#sliceCnt').val();
 
-            // »çÀÌÁî°¡ ÁöÁ¤µÇÁö ¾ÊÀ¸¸é ±âº» 5
+            // ì‚¬ì´ì¦ˆê°€ ì§€ì •ë˜ì§€ ì•Šìœ¼ë©´ ê¸°ë³¸ 5
             if(sliceCnt == '' || sliceCnt == undefined){
                 sliceCnt = 5; 
                 $('#sliceCnt').val('5');
             }
 
             if (sliceCnt  > 20){
-                return alert('ÃÖ´ë 20°³ ¸¦ ³ÑÀ» ¼ö ¾ø½À´Ï´Ù.');
+                return alert('ìµœëŒ€ 20ê°œ ë¥¼ ë„˜ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.');
             }
 
-            // ¿ø ³ª´©±â
+            // ì› ë‚˜ëˆ„ê¸°
             if (sliceOption == 'true') {
                 setSliceCircle(sliceCnt, true);
             }else{
@@ -113,7 +115,7 @@
 
             //resetCanvas(canvas,ctx);
             //ctx.resetTransform();
-            /// Äµ¹ö½º Å¬¸®¾î
+            /// ìº”ë²„ìŠ¤ í´ë¦¬ì–´
             ctx.setTransform(1,0,0,1,0,0);
             ctx.clearRect(0,0, canvas.width, canvas.height);
 
@@ -127,7 +129,7 @@
 
         $('#spinBtn').on('click', function  () {
                 if(_state =='spin'){
-                    return alert('ÀÌ¹Ì ÃßÃ·ÁßÀÔ´Ï´Ù.');
+                    return alert('ì´ë¯¸ ì¶”ì²¨ì¤‘ì…ë‹ˆë‹¤.');
                 }
                 else{
                     _state = 'spin';
@@ -136,21 +138,21 @@
         });
     }
     else{
-        alert('Áö¿øÇÏÁö ¾Ê´Â ºê¶ó¿ìÀú ÀÔ´Ï´Ù.');
+        alert('ì§€ì›í•˜ì§€ ì•ŠëŠ” ë¸Œë¼ìš°ì € ì…ë‹ˆë‹¤.');
     }
 
-    // ·ê·¿ È¸Àü
+    // ë£°ë › íšŒì „
     function spinCircle  (canvas, context) {
-        var  centerX = Math.floor(canvas.width/2); //Äµ¹ö½º Áß½ÉÁ¡ ±¸ÇÏ±â
-        var  centerY = Math.floor(canvas.height /2); //Äµ¹ö½º Áß½ÉÁ¡ ±¸ÇÏ±â
+        var  centerX = Math.floor(canvas.width/2); //ìº”ë²„ìŠ¤ ì¤‘ì‹¬ì  êµ¬í•˜ê¸°
+        var  centerY = Math.floor(canvas.height /2); //ìº”ë²„ìŠ¤ ì¤‘ì‹¬ì  êµ¬í•˜ê¸°
         var rotateAngle = getRadian(_rotate);
 
         if (_state =='spin'){
             context.save();
-            context.translate(centerX, centerY);  // ÀÌ¹ÌÁö¸¦ È¸ÀüÇÒ ÁÂÇ¥¸¦ ¼³Á¤ÇÕ´Ï´Ù.
+            context.translate(centerX, centerY);  // ì´ë¯¸ì§€ë¥¼ íšŒì „í•  ì¢Œí‘œë¥¼ ì„¤ì •í•©ë‹ˆë‹¤.
             context.rotate(rotateAngle); 
             context.translate(-centerX, -centerY);
-            // ÁÂÇ¥¸¦ È¸ÀüÇÑ  »óÅÂ·Î ¿øÀ» ±×¸³´Ï´Ù.
+            // ì¢Œí‘œë¥¼ íšŒì „í•œ  ìƒíƒœë¡œ ì›ì„ ê·¸ë¦½ë‹ˆë‹¤.
             drawSliceCircle(canvas, context) ; 
 
             drawArrow(canvas, ctx);
@@ -175,15 +177,15 @@
         }
     };
 
-    //È­»ìÇ¥ ±×¸®±â
+    //í™”ì‚´í‘œ ê·¸ë¦¬ê¸°
     function drawArrow (canvas, context) {
-            var  centerX = Math.floor(canvas.width/2); //Äµ¹ö½º Áß½ÉÁ¡ ±¸ÇÏ±â
-            var  centerY = Math.floor(canvas.height /2); //Äµ¹ö½º Áß½ÉÁ¡ ±¸ÇÏ±â
+            var  centerX = Math.floor(canvas.width/2); //ìº”ë²„ìŠ¤ ì¤‘ì‹¬ì  êµ¬í•˜ê¸°
+            var  centerY = Math.floor(canvas.height /2); //ìº”ë²„ìŠ¤ ì¤‘ì‹¬ì  êµ¬í•˜ê¸°
             context.save();
             ctx.setTransform(1,0,0,1,0,0);
 
             context.beginPath();
-            // ±×¸± ÁÂÇ¥ ±âÁØÁ¡
+            // ê·¸ë¦´ ì¢Œí‘œ ê¸°ì¤€ì 
             context.moveTo(centerX, 60);
             context.lineTo(centerX -10, 40);
             context.lineTo(centerX + 10, 40);
@@ -198,29 +200,29 @@
             context.restore();
     }
     
-    //·ê·¿ ¿ø ±×¸®±â
+    //ë£°ë › ì› ê·¸ë¦¬ê¸°
     function drawSliceCircle (canvas, context) {
-        var  centerX = Math.floor(canvas.width/2); //Äµ¹ö½º Áß½ÉÁ¡ ±¸ÇÏ±â
-        var  centerY = Math.floor(canvas.height /2); //Äµ¹ö½º Áß½ÉÁ¡ ±¸ÇÏ±â
-        var dx = Math.floor(canvas.width * 0.28) ; // label À§Ä¡ x °ª
-        var dy = Math.floor(canvas.height * 0.035); // label À§Ä¡ y°ª
+        var  centerX = Math.floor(canvas.width/2); //ìº”ë²„ìŠ¤ ì¤‘ì‹¬ì  êµ¬í•˜ê¸°
+        var  centerY = Math.floor(canvas.height /2); //ìº”ë²„ìŠ¤ ì¤‘ì‹¬ì  êµ¬í•˜ê¸°
+        var dx = Math.floor(canvas.width * 0.28) ; // label ìœ„ì¹˜ x ê°’
+        var dy = Math.floor(canvas.height * 0.035); // label ìœ„ì¹˜ yê°’
 
         for (var i = 0; i < _rotateList.length; i++) {
             context.save();
             var startAngle = getRadian(getRotate(i));
-            var endAngle = getRadian(_rotateList[i]['rotate']) + startAngle; //Á¾·á °¢µµ ±¸ÇÏ±â
+            var endAngle = getRadian(_rotateList[i]['rotate']) + startAngle; //ì¢…ë£Œ ê°ë„ êµ¬í•˜ê¸°
 
             context.beginPath();
             //console.log('angle x, y => ' + startAngle + ',' + endAngle);
-            context.moveTo(centerX,centerY); //Áß½ÉÁ¡ x  y ¸¸Å­ ÀÌµ¿
-            context.arc(centerX,centerY, 200, startAngle,endAngle); // ½ÃÀÛ ÁÂÇ¥, ³¡ ÁÂÇ¥ ,  ¿øÀÇ Å©±â, ½ÃÀÛ °¢µµ, ³¡ °¢µµ
+            context.moveTo(centerX,centerY); //ì¤‘ì‹¬ì  x  y ë§Œí¼ ì´ë™
+            context.arc(centerX,centerY, 200, startAngle,endAngle); // ì‹œì‘ ì¢Œí‘œ, ë ì¢Œí‘œ ,  ì›ì˜ í¬ê¸°, ì‹œì‘ ê°ë„, ë ê°ë„
             context.closePath();
 
-            //»ö ÁöÁ¤ & Ã¤¿ì±â
+            //ìƒ‰ ì§€ì • & ì±„ìš°ê¸°
             context.fillStyle = _rotateList[i]['color'];
             context.fill();
 
-            //Å×µÎ¸®  ÁöÁ¤
+            //í…Œë‘ë¦¬  ì§€ì •
             context.strokeStyle= '#fff';
             context.lineWidth =0.7;
             context.stroke();
@@ -238,7 +240,7 @@
         }
     }
     
-    // ·¹ÀÌºí ±×¸®±â
+    // ë ˆì´ë¸” ê·¸ë¦¬ê¸°
     function drawLabel (context) {
         context.save();
         context.font  = '11pt Arial';
@@ -252,30 +254,30 @@
         for (var i = 0; i < _rotateList.length; i++) {
             var  y  = 20 * (i+1);
             
-            // Ä®¶ó »ç°¢Çü ±×¸®±â
+            // ì¹¼ë¼ ì‚¬ê°í˜• ê·¸ë¦¬ê¸°
             context.fillStyle = _rotateList[i]['color'];
             context.fillRect(x, y ,rectWidth , rectHeight);
 
-            // Ä®¶ó ÀÌ¸§ 
-            // ÁÂÇ¥ = x  + »ç°¢Çü±æÀÌ +1 ÀÌ ½ÃÀÛÁ¡
+            // ì¹¼ë¼ ì´ë¦„ 
+            // ì¢Œí‘œ = x  + ì‚¬ê°í˜•ê¸¸ì´ +1 ì´ ì‹œì‘ì 
             context.fillStyle = '#000';
             context.fillText(_rotateList[i]['name'] , x + rectWidth +1, y + rectHeight -1);
 
-            // ÁÂÇ¥ ÀúÀå
+            // ì¢Œí‘œ ì €ì¥
             _rotateList[i]['position'] = { startX:x , startY: y,  endX : x+rectWidth, endY: y+rectHeight};
         }
         context.restore();
     }
 
-    //±×¸± ¾Ş±ÛÀÇ °¢µµ ±¸ÇÏ±â
-    // http://www.w3schools.com/tags/canvas_arc.asp   angle ÂüÁ¶.
-    // °¢µµ´Â ´ÜÀ§´Â 'µµ(dgree)'°¡ ¾Æ´Ï¶ó  '¶óµğ¾È(radian)'À» »ç¿ëÇÑ´Ù.
-    // µµ¸¦ ¶óµğ¾ÈÀ¸·Î ¹Ù²Ù´Â ½Ä   ex) ¶óµğ¾È = µµ * Math.PI/180;
+    //ê·¸ë¦´ ì•µê¸€ì˜ ê°ë„ êµ¬í•˜ê¸°
+    // http://www.w3schools.com/tags/canvas_arc.asp   angle ì°¸ì¡°.
+    // ê°ë„ëŠ” ë‹¨ìœ„ëŠ” 'ë„(dgree)'ê°€ ì•„ë‹ˆë¼  'ë¼ë””ì•ˆ(radian)'ì„ ì‚¬ìš©í•œë‹¤.
+    // ë„ë¥¼ ë¼ë””ì•ˆìœ¼ë¡œ ë°”ê¾¸ëŠ” ì‹   ex) ë¼ë””ì•ˆ = ë„ * Math.PI/180;
     function getRadian (rotate) {
         return (rotate * Math.PI) /180;
     }
 
-    // ÇöÀç ¾Ş±Û ½ÃÀÛÁ¡À» ±¸ÇÑ´Ù.
+    // í˜„ì¬ ì•µê¸€ ì‹œì‘ì ì„ êµ¬í•œë‹¤.
     function getRotate (i) {
         var sum = 0;
 
@@ -286,7 +288,7 @@
         return sum;
     }
 
-    // Å¬¸¯ ÀÌº¥Æ® 
+    // í´ë¦­ ì´ë²¤íŠ¸ 
     function changeName (e){
         if(_state != 'spin'){
             var  canvasX = e.pageX - this.offsetLeft;
@@ -307,7 +309,7 @@
             };
         }
         else{
-            alert('ÃßÃ·Áß¿¡ ÀÌ¸§À» ¹Ù²Ü ¼ö ¾ø½À´Ï´Ù.');
+            alert('ì¶”ì²¨ì¤‘ì— ì´ë¦„ì„ ë°”ê¿€ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.');
         }
     }
 
@@ -333,7 +335,7 @@
             };
     }
 
-    //RGB °ª ¸®ÅÏ 
+    //RGB ê°’ ë¦¬í„´ 
     //#FF2B23
     function getRGB () {
         var rgb = '#';
@@ -348,11 +350,11 @@
 
         return rgb;
     }
-    //  ±âº» ¿ø °ª ¼ÂÆÃ
+    //  ê¸°ë³¸ ì› ê°’ ì…‹íŒ…
     function setSliceCircle (sliceCnt, sliceOption) {
-        // ÃÊ±âÈ­
+        // ì´ˆê¸°í™”
         _rotateList = [];
-        // ±âº»°ªÀÏ °æ¿ì ±Õµî ºĞ¹è
+        // ê¸°ë³¸ê°’ì¼ ê²½ìš° ê· ë“± ë¶„ë°°
         if (sliceOption) {
             var defaultSize =  Math.floor(360/sliceCnt);
 
@@ -365,14 +367,14 @@
             var minRadian = 0;
             var tmpRandomNum = 0;
             for (var i = 1; i <= sliceCnt; i++) {
-                // ÃÖ´ë 360 µµ ³ª¿À´Â°É ¸·±â À§ÇÑ °ª
+                // ìµœëŒ€ 360 ë„ ë‚˜ì˜¤ëŠ”ê±¸ ë§‰ê¸° ìœ„í•œ ê°’
                 var tmpCnt = sliceCnt -i;
                 var randomSize = 0;
 
                 minRadian = _minRadian * (tmpCnt);
                 maxRandomNum  = 360 - (minRadian+tmpRandomNum);
                 
-                // ¸¶Áö¸·¿£ ¸ğÀÚ¶õ ¼ö¸¸Å­ Ã¤¿öÁØ´Ù
+                // ë§ˆì§€ë§‰ì—” ëª¨ìë€ ìˆ˜ë§Œí¼ ì±„ì›Œì¤€ë‹¤
                 if ( i == sliceCnt) {
                     randomSize = maxRandomNum
                 }
@@ -392,7 +394,7 @@
         }
     }
 
-    // È¸Àü °¢µµ ¹× ½ºÇÇµå Àç¼³Á¤
+    // íšŒì „ ê°ë„ ë° ìŠ¤í”¼ë“œ ì¬ì„¤ì •
     function setRandomSprin() {
          var randomSpeed =  0;
 
@@ -417,7 +419,7 @@ $('#cValue').on('keypress',  function  (e) {
             if (thisValue != '' && thisValue != undefined){
                 _rotateList[cIdx]['name'] = thisValue;
                 var can = document.getElementById('can');
-                // Äµ¹ö½º¿¡¼­ Context ÇÔ¼ö·Î 2d °´Ã¼¸¦ °¡Á®¿È
+                // ìº”ë²„ìŠ¤ì—ì„œ Context í•¨ìˆ˜ë¡œ 2d ê°ì²´ë¥¼ ê°€ì ¸ì˜´
                 var contx = canvas.getContext('2d');
 
                 contx.setTransform(1,0,0,1,0,0);
@@ -431,7 +433,7 @@ $('#cValue').on('keypress',  function  (e) {
             }
         }
         else {
-            alert('°ªÀÌ Àß ¸ø µÇ¾ú½À´Ï´Ù. Ãë¼Ò ÇÏ½Å ÈÄ ´Ù½Ã ¼±ÅÃÇØ ÁÖ¼¼¿ä.');
+            alert('ê°’ì´ ì˜ ëª» ë˜ì—ˆìŠµë‹ˆë‹¤. ì·¨ì†Œ í•˜ì‹  í›„ ë‹¤ì‹œ ì„ íƒí•´ ì£¼ì„¸ìš”.');
         }
     }
 })
@@ -445,7 +447,7 @@ $('#btnChangeName').on('click',  function  (e) {
             if (cValue != '' && cValue != undefined){
                 _rotateList[cIdx]['name'] = cValue;
                 var can = document.getElementById('can');
-                // Äµ¹ö½º¿¡¼­ Context ÇÔ¼ö·Î 2d °´Ã¼¸¦ °¡Á®¿È
+                // ìº”ë²„ìŠ¤ì—ì„œ Context í•¨ìˆ˜ë¡œ 2d ê°ì²´ë¥¼ ê°€ì ¸ì˜´
                 var contx = canvas.getContext('2d');
 
                 contx.setTransform(1,0,0,1,0,0);
@@ -459,7 +461,7 @@ $('#btnChangeName').on('click',  function  (e) {
             }
         }
         else {
-            alert('°ªÀÌ Àß ¸ø µÇ¾ú½À´Ï´Ù. Ãë¼Ò ÇÏ½Å ÈÄ ´Ù½Ã ¼±ÅÃÇØ ÁÖ¼¼¿ä.');
+            alert('ê°’ì´ ì˜ ëª» ë˜ì—ˆìŠµë‹ˆë‹¤. ì·¨ì†Œ í•˜ì‹  í›„ ë‹¤ì‹œ ì„ íƒí•´ ì£¼ì„¸ìš”.');
         }
 })
 
@@ -467,3 +469,5 @@ $('#btnCancel').on('click', function  () {
     $('#changeName').fadeOut();
 })
 </script>
+<body>
+</html>
