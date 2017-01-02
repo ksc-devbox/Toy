@@ -1,7 +1,6 @@
 <html>
-<meta  content-type="text/html"  charset=utf-8>
+<meta  content-type="text/html"  charset="utf-8">
 <head>
-    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <title>ksc 룰렛</title>
     <style type="text/css">
     body{
@@ -40,7 +39,7 @@
 <body>
 <div id ="changeName">
     <div id="inputBox">
-        <label>Change Name</label>
+        <label>Change Name Test</label>
         <input type="hidden"  id="cIdx" value="">
         <input type="text"  id="cValue" value="">
         <input type="button" id="btnChangeName" value="확인">
@@ -59,6 +58,7 @@
 <div>
     <canvas id="can" width="600" height="500" ></canvas>
 </div>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 <script type="text/javascript">
     //로테이션 구분
     var _rotateList = [];
@@ -99,7 +99,7 @@
 
             // 사이즈가 지정되지 않으면 기본 5
             if(sliceCnt == '' || sliceCnt == undefined){
-                sliceCnt = 5; 
+                sliceCnt = 5;
                 $('#sliceCnt').val('5');
             }
 
@@ -151,10 +151,10 @@
         if (_state =='spin'){
             context.save();
             context.translate(centerX, centerY);  // 이미지를 회전할 좌표를 설정합니다.
-            context.rotate(rotateAngle); 
+            context.rotate(rotateAngle);
             context.translate(-centerX, -centerY);
             // 좌표를 회전한  상태로 원을 그립니다.
-            drawSliceCircle(canvas, context) ; 
+            drawSliceCircle(canvas, context) ;
 
             drawArrow(canvas, ctx);
 
@@ -164,9 +164,9 @@
                 _rotate = _rotate -0.5;
                 window.requestAnimFrame(function  () {
                     setTimeout(function(){
-                        spinCircle(canvas,ctx) ;    
+                        spinCircle(canvas,ctx) ;
                     }, 1200/_speed);
-                    
+
                 });
             }
             else if (_speed <= 0) {
@@ -200,7 +200,7 @@
             context.fill();
             context.restore();
     }
-    
+
     //룰렛 원 그리기
     function drawSliceCircle (canvas, context) {
         var  centerX = Math.floor(canvas.width/2); //캔버스 중심점 구하기
@@ -240,7 +240,7 @@
             context.restore();
         }
     }
-    
+
     // 레이블 그리기
     function drawLabel (context) {
         context.save();
@@ -248,18 +248,18 @@
         var rectWidth = 14;
         var rectHeight = 12;
         var x = 8;
-        
+
         context.fillStyle = '#000';
         context.fillText('To change the label name, click a color.', 6 , 15);
 
         for (var i = 0; i < _rotateList.length; i++) {
             var  y  = 20 * (i+1);
-            
+
             // 칼라 사각형 그리기
             context.fillStyle = _rotateList[i]['color'];
             context.fillRect(x, y ,rectWidth , rectHeight);
 
-            // 칼라 이름 
+            // 칼라 이름
             // 좌표 = x  + 사각형길이 +1 이 시작점
             context.fillStyle = '#000';
             context.fillText(_rotateList[i]['name'] , x + rectWidth +1, y + rectHeight -1);
@@ -289,7 +289,7 @@
         return sum;
     }
 
-    // 클릭 이벤트 
+    // 클릭 이벤트
     function changeName (e){
         if(_state != 'spin'){
             var  canvasX = e.pageX - this.offsetLeft;
@@ -332,11 +332,11 @@
                 else{
                         can.style.cursor = 'default';
                 }
-                 
+
             };
     }
 
-    //RGB 값 리턴 
+    //RGB 값 리턴
     //#FF2B23
     function getRGB () {
         var rgb = '#';
@@ -374,7 +374,7 @@
 
                 minRadian = _minRadian * (tmpCnt);
                 maxRandomNum  = 360 - (minRadian+tmpRandomNum);
-                
+
                 // 마지막엔 모자란 수만큼 채워준다
                 if ( i == sliceCnt) {
                     randomSize = maxRandomNum
